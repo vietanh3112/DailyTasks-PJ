@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F5F5F5">
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chỉnh sửa nhiệm vụ"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Nhập tên nhiệm vụ -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tên nhiệm vụ"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextTaskTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Nhập thời gian bắt đầu -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Thời gian bắt đầu (HH:mm)"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextStartTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="time" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Nút lưu -->
+    <Button
+        android:id="@+id/buttonSaveTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lưu"
+        android:backgroundTint="#8D5524"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Nút quay lại -->
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quay lại"
+        android:backgroundTint="#8D5524"
+        android:textColor="#FFFFFF" />
+</LinearLayout>
