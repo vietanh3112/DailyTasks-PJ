@@ -179,8 +179,6 @@ public class HomeActivity extends AppCompatActivity {
                     taskList.add(task);
                 } while (cursor.moveToNext());
                 cursor.close();
-            } else {
-                Toast.makeText(this, "Không có nhiệm vụ nào vào ngày " + date, Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
