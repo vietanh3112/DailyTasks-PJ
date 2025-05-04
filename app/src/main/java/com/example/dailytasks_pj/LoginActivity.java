@@ -3,6 +3,7 @@ package com.example.dailytasks_pj;
 import static com.example.dailytasks_pj.R.id.editTextUsername;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText editTextPassword;
     private DatabaseHelper dbHelper;
     private TextView textViewDangKy;
+    private TaskScheduler taskScheduler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login);
 
         dbHelper = new DatabaseHelper(this);
+        taskScheduler = new TaskScheduler(this);
 
         editTextUsername =findViewById(R.id.editTextUsername);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -47,9 +50,17 @@ public class LoginActivity extends AppCompatActivity {
                 // Kiểm tra thông tin đăng nhập
                 if (validateInput(username, password)) {
                     if (dbHelper.checkUser(username, password)) {
+                        SharedPreferences preferences = getSharedPreferences("DailyTasksPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("username", username);
+                        editor.apply();
+                        // Lập lịch thông báo cho tất cả nhiệm vụ
+                        taskScheduler.scheduleAllTaskNotifications();
                         // Đăng nhập thành công, chuyển đến MainActivity
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                        intent.putExtra("username", username);
+                        startActivity(intent);
                         startActivity(intent);
                         finish();
                     } else {

@@ -20,6 +20,7 @@ public class EditTaskActivity extends AppCompatActivity {
     private TaskScheduler taskScheduler;
     private int taskId;
     private String taskDate;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class EditTaskActivity extends AppCompatActivity {
         String taskTitle = getIntent().getStringExtra("taskTitle");
         String taskStartTime = getIntent().getStringExtra("taskStartTime");
         taskDate = getIntent().getStringExtra("taskDate");
+        userId = getIntent().getIntExtra("userId", -1);
 
         if (taskId == -1 || taskDate == null) {
             Toast.makeText(this, "Không nhận được thông tin nhiệm vụ!", Toast.LENGTH_SHORT).show();
@@ -82,7 +84,7 @@ public class EditTaskActivity extends AppCompatActivity {
             }
 
             // Cập nhật nhiệm vụ vào cơ sở dữ liệu
-            boolean success = dbHelper.updateTask(taskId, title, startTime, taskDate);
+            boolean success = dbHelper.updateTask(taskId, title, startTime, taskDate,userId);
             if (success) {
                 Toast.makeText(this, "Cập nhật nhiệm vụ thành công!", Toast.LENGTH_SHORT).show();
 

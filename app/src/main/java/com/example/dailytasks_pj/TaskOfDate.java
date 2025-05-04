@@ -1,6 +1,7 @@
 package com.example.dailytasks_pj;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -23,6 +24,8 @@ public class TaskOfDate extends AppCompatActivity {
     private TaskAdapter taskAdapter;
     private String currentDate;
     private TaskScheduler taskScheduler;
+    private String currentUsername;
+    private int currentUserId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +36,29 @@ public class TaskOfDate extends AppCompatActivity {
         int year = intent.getIntExtra("year", -1);
         int month = intent.getIntExtra("month", -1);
         int day = intent.getIntExtra("day", -1);
+        currentUsername = intent.getStringExtra("username");
+
+        // Nếu username không được truyền, lấy từ SharedPreferences
+        if (currentUsername == null) {
+            SharedPreferences preferences = getSharedPreferences("DailyTasksPrefs", MODE_PRIVATE);
+            currentUsername = preferences.getString("username", null);
+            if (currentUsername == null) {
+                Toast.makeText(this, "Không tìm thấy thông tin đăng nhập, vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
+                Intent loginIntent = new Intent(this, MainActivity.class);
+                startActivity(loginIntent);
+                finish();
+                return;
+            }
+        }
+
+        // Lấy user_id từ DatabaseHelper
+        dbHelper = new DatabaseHelper(this);
+        currentUserId = dbHelper.getUserIdByUsername(currentUsername);
+        if (currentUserId == -1) {
+            Toast.makeText(this, "Không tìm thấy user_id, vui lòng kiểm tra dữ liệu!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         // Kiểm tra dữ liệu hợp lệ
         if (year == -1 || month == -1 || day == -1) {
@@ -101,7 +127,7 @@ public class TaskOfDate extends AppCompatActivity {
     private void loadTasks(String date) {
         taskList.clear();
         try {
-            Cursor cursor = dbHelper.getTasksByDate(date);
+            Cursor cursor = dbHelper.getTasksByDateAndUser(date,currentUserId);
             if (cursor != null && cursor.moveToFirst()) {
                 // Kiểm tra các cột có tồn tại không
                 int idIndex = cursor.getColumnIndex("id");

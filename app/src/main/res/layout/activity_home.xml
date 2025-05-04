@@ -27,8 +27,8 @@
             android:id="@+id/listViewTasks"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:layout_weight="1"/>
 
         <!-- Nút thêm công việc -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -38,7 +38,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
             android:src="@drawable/ic_add"
-            app:backgroundTint="@color/white"/>
+            app:backgroundTint="@color/white" />
     </LinearLayout>
     <!-- Thanh điều hướng dưới cùng -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

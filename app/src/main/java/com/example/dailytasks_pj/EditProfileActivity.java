@@ -19,7 +19,6 @@ public class EditProfileActivity extends AppCompatActivity {
     private Button buttonSave;
     private Button buttonBack;
     private DatabaseHelper dbHelper;
-    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +35,7 @@ public class EditProfileActivity extends AppCompatActivity {
         buttonSave = findViewById(R.id.buttonSave);
         buttonBack = findViewById(R.id.buttonBack);
 
-        // Giả định username đã đăng nhập là "testuser"
-        username = "testuser";
+        String username = getIntent().getStringExtra("username");
 
         // Hiển thị thông tin hiện tại
         displayUserInfo(username);

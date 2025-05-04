@@ -71,8 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        // Hiển thị thông tin người dùng (giả định username đã đăng nhập là "testuser")
-        displayUserInfo("testuser");
+        displayUserInfo(username);
 
         // Xử lý sự kiện "Hồ sơ cá nhân"
         textViewProfile.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +80,7 @@ public class ProfileActivity extends AppCompatActivity {
                 // Có thể chuyển đến một màn hình chi tiết hồ sơ (nếu cần)
                 // Hiện tại chỉ hiển thị thông báo
                 Intent intent = new Intent(ProfileActivity.this, ProfileDetailActivity.class);
+                intent.putExtra("username", username);
                 startActivity(intent);
             }
         });
@@ -91,6 +91,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Chuyển đến màn hình sửa thông tin
                 Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                intent.putExtra("username", username);
                 startActivity(intent);
             }
         });
