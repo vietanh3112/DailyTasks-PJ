@@ -48,6 +48,16 @@ public class TaskAdapter extends ArrayAdapter<Task> {
                         2
                 );
             }
+            if (context instanceof HomeActivity) {
+                ((HomeActivity) context).startActivityForResult(
+                        new android.content.Intent(context, EditTaskActivity.class)
+                                .putExtra("taskId", task.getId())
+                                .putExtra("taskTitle", task.getTitle())
+                                .putExtra("taskStartTime", task.getStartTime())
+                                .putExtra("taskDate", task.getDate()),
+                        2
+                );
+            }
         });
 
         buttonDelete.setOnClickListener(v -> {
@@ -59,6 +69,9 @@ public class TaskAdapter extends ArrayAdapter<Task> {
                         // Nếu người dùng chọn "Có", tiến hành xóa
                         if (context instanceof TaskOfDate) {
                             ((TaskOfDate) context).deleteTask(task.getId());
+                        }
+                        if (context instanceof HomeActivity) {
+                            ((HomeActivity) context).deleteTask(task.getId());
                         }
                     })
                     .setNegativeButton("Không", (dialog, which) -> {

@@ -1,6 +1,8 @@
 package com.example.dailytasks_pj;
 
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +22,7 @@ public class EditTaskActivity extends AppCompatActivity {
     private TaskScheduler taskScheduler;
     private int taskId;
     private String taskDate;
-    private int userId;
+    private String currentUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +44,30 @@ public class EditTaskActivity extends AppCompatActivity {
         String taskTitle = getIntent().getStringExtra("taskTitle");
         String taskStartTime = getIntent().getStringExtra("taskStartTime");
         taskDate = getIntent().getStringExtra("taskDate");
-        userId = getIntent().getIntExtra("userId", -1);
 
         if (taskId == -1 || taskDate == null) {
             Toast.makeText(this, "Không nhận được thông tin nhiệm vụ!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        // Nếu username không được truyền, lấy từ SharedPreferences
+        if (currentUsername == null) {
+            SharedPreferences preferences = getSharedPreferences("DailyTasksPrefs", MODE_PRIVATE);
+            currentUsername = preferences.getString("username", null);
+            if (currentUsername == null) {
+                Toast.makeText(this, "Không tìm thấy thông tin đăng nhập, vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
+                Intent loginIntent = new Intent(this, MainActivity.class);
+                startActivity(loginIntent);
+                finish();
+                return;
+            }
+        }
+
+        // Lấy user_id từ DatabaseHelper
+        dbHelper = new DatabaseHelper(this);
+        int currentUserId = dbHelper.getUserIdByUsername(currentUsername);
+        if (currentUserId == -1) {
+            Toast.makeText(this, "Không tìm thấy user_id, vui lòng kiểm tra dữ liệu!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -84,7 +106,7 @@ public class EditTaskActivity extends AppCompatActivity {
             }
 
             // Cập nhật nhiệm vụ vào cơ sở dữ liệu
-            boolean success = dbHelper.updateTask(taskId, title, startTime, taskDate,userId);
+            boolean success = dbHelper.updateTask(taskId, title, startTime, taskDate,currentUserId);
             if (success) {
                 Toast.makeText(this, "Cập nhật nhiệm vụ thành công!", Toast.LENGTH_SHORT).show();
 

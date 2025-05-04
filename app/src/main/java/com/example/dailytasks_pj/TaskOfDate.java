@@ -86,7 +86,12 @@ public class TaskOfDate extends AppCompatActivity {
         listViewTasks.setAdapter(taskAdapter);
 
         // Xử lý nút quay lại
-        buttonBack.setOnClickListener(v -> finish());
+        buttonBack.setOnClickListener(v -> {
+            Intent intentBack = new Intent(TaskOfDate.this, WorkCalendarActivity.class);
+            intentBack.putExtra("username", currentUsername);
+            startActivity(intentBack);
+            finish();
+        });
 
         // Xử lý nút thêm nhiệm vụ
         buttonAdd.setOnClickListener(v -> {

@@ -138,7 +138,7 @@ public class HomeActivity extends AppCompatActivity {
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String currentDate = sdf.format(new Date());
-            loadTasks(currentDate);
+            loadTasks(currentDate); // Làm mới danh sách
         } else {
             Toast.makeText(this, "Xóa nhiệm vụ thất bại!", Toast.LENGTH_SHORT).show();
         }
