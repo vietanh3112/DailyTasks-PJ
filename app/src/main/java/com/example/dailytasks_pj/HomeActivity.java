@@ -1,6 +1,7 @@
 package com.example.dailytasks_pj;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -29,6 +30,8 @@ public class HomeActivity extends AppCompatActivity {
     private TaskAdapter taskAdapter;
     private BottomNavigationView bottomNavigationView;
     private TaskScheduler taskScheduler;
+    private String currentUsername;
+    private int currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +69,29 @@ public class HomeActivity extends AppCompatActivity {
         });
         bottomNavigationView = findViewById(R.id.bottomNavigation);
 
-        // Nhận username từ Intent
-        String username = getIntent().getStringExtra("username");
+        currentUsername = getIntent().getStringExtra("username");
+
+        // Nếu username không được truyền, lấy từ SharedPreferences
+        if (currentUsername == null) {
+            SharedPreferences preferences = getSharedPreferences("DailyTasksPrefs", MODE_PRIVATE);
+            currentUsername = preferences.getString("username", null);
+            if (currentUsername == null) {
+                Toast.makeText(this, "Không tìm thấy thông tin đăng nhập, vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
+                Intent loginIntent = new Intent(this, MainActivity.class);
+                startActivity(loginIntent);
+                finish();
+                return;
+            }
+        }
+
+        // Lấy user_id từ DatabaseHelper
+        dbHelper = new DatabaseHelper(this);
+        currentUserId = dbHelper.getUserIdByUsername(currentUsername);
+        if (currentUserId == -1) {
+            Toast.makeText(this, "Không tìm thấy user_id, vui lòng kiểm tra dữ liệu!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         // Đặt mục "Nhiệm vụ" làm mục mặc định
         bottomNavigationView.setSelectedItemId(R.id.menu_tasks);
@@ -80,17 +104,17 @@ public class HomeActivity extends AppCompatActivity {
                 int itemId = item.getItemId(); // Lấy ID của item
                 if (itemId == R.id.menu_tasks) {
                     intent = new Intent(HomeActivity.this, HomeActivity.class);
-                    intent.putExtra("username", username);
+                    intent.putExtra("username", currentUsername);
                     startActivity(intent);
                     return true;
                 } else if (itemId == R.id.menu_calendar) {
                     intent = new Intent(HomeActivity.this, WorkCalendarActivity.class);
-                    intent.putExtra("username", username);
+                    intent.putExtra("username", currentUsername);
                     startActivity(intent);
                     return true;
                 } else if (itemId == R.id.menu_profile) {
                     intent = new Intent(HomeActivity.this, ProfileActivity.class);
-                    intent.putExtra("username", username);
+                    intent.putExtra("username", currentUsername);
                     startActivity(intent);
                     return true;
                 }
@@ -131,17 +155,36 @@ public class HomeActivity extends AppCompatActivity {
     // Hàm tải danh sách nhiệm vụ
     private void loadTasks(String date) {
         taskList.clear();
-        Cursor cursor = dbHelper.getTasksByDate(date);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int id = cursor.getInt(cursor.getColumnIndex("id"));
-                String title = cursor.getString(cursor.getColumnIndex("title"));
-                String startTime = cursor.getString(cursor.getColumnIndex("start_time"));
-                String taskDate = cursor.getString(cursor.getColumnIndex("date"));
-                Task task = new Task(id, title, startTime, taskDate);
-                taskList.add(task);
-            } while (cursor.moveToNext());
-            cursor.close();
+        try {
+            Cursor cursor = dbHelper.getTasksByDateAndUser(date,currentUserId);
+            if (cursor != null && cursor.moveToFirst()) {
+                // Kiểm tra các cột có tồn tại không
+                int idIndex = cursor.getColumnIndex("id");
+                int titleIndex = cursor.getColumnIndex("title");
+                int startTimeIndex = cursor.getColumnIndex("start_time");
+                int dateIndex = cursor.getColumnIndex("date");
+
+                if (idIndex == -1 || titleIndex == -1 || startTimeIndex == -1 || dateIndex == -1) {
+                    Toast.makeText(this, "Lỗi: Cột không tồn tại trong cơ sở dữ liệu!", Toast.LENGTH_SHORT).show();
+                    cursor.close();
+                    return;
+                }
+
+                do {
+                    int id = cursor.getInt(idIndex);
+                    String title = cursor.getString(titleIndex);
+                    String startTime = cursor.getString(startTimeIndex);
+                    String taskDate = cursor.getString(dateIndex);
+                    Task task = new Task(id, title, startTime, taskDate);
+                    taskList.add(task);
+                } while (cursor.moveToNext());
+                cursor.close();
+            } else {
+                Toast.makeText(this, "Không có nhiệm vụ nào vào ngày " + date, Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Lỗi khi tải nhiệm vụ: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         // Hiển thị hình gấu trúc nếu danh sách trống

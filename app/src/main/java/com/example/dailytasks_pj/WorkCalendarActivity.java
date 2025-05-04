@@ -49,6 +49,9 @@ public class WorkCalendarActivity extends AppCompatActivity {
                     finish(); // Đóng activity hiện tại
                     return true;
                 } else if (itemId == R.id.menu_calendar) {
+                    intent = new Intent(WorkCalendarActivity.this, WorkCalendarActivity.class);
+                    intent.putExtra("username", username);
+                    startActivity(intent);
                     return true; // Đã ở WorkCalendarActivity, không cần mở lại
                 } else if (itemId == R.id.menu_profile) {
                     intent = new Intent(WorkCalendarActivity.this, ProfileActivity.class);

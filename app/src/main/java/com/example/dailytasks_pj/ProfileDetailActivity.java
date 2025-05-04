@@ -30,9 +30,10 @@ public class ProfileDetailActivity extends AppCompatActivity {
         textViewDetailPhone = findViewById(R.id.textViewDetailPhone);
         textViewDetailPassword = findViewById(R.id.textViewDetailPassword);
         buttonBack = findViewById(R.id.buttonBack);
+        String username = getIntent().getStringExtra("username");
 
         // Hiển thị thông tin người dùng (giả định username đã đăng nhập là "testuser")
-        displayUserInfo("testuser");
+        displayUserInfo(username);
 
         // Xử lý nút quay lại
         buttonBack.setOnClickListener(new View.OnClickListener() {

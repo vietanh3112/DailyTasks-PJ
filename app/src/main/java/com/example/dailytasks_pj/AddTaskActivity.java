@@ -1,6 +1,7 @@
 package com.example.dailytasks_pj;
 
 import android.app.TimePickerDialog;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -74,20 +75,27 @@ public class AddTaskActivity extends AppCompatActivity {
                 return;
             }
 
-            // Lưu nhiệm vụ vào cơ sở dữ liệu
-            boolean success = dbHelper.addTask(title, startTime, selectedDate);
+            // Lấy user_id từ SharedPreferences
+            SharedPreferences preferences = getSharedPreferences("DailyTasksPrefs", MODE_PRIVATE);
+            String username = preferences.getString("username", null);
+            if (username == null) {
+                Toast.makeText(this, "Không tìm thấy thông tin đăng nhập!", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            int userId = dbHelper.getUserIdByUsername(username);
+            if (userId == -1) {
+                Toast.makeText(this, "Không tìm thấy user_id!", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            // Thêm nhiệm vụ vào cơ sở dữ liệu
+            boolean success = dbHelper.addTask(title, startTime, selectedDate, userId);
             if (success) {
                 Toast.makeText(this, "Thêm nhiệm vụ thành công!", Toast.LENGTH_SHORT).show();
-
-                // Lập lịch thông báo cho nhiệm vụ vừa thêm
-                Cursor cursor = dbHelper.getTasksByDate(selectedDate);
-                if (cursor != null && cursor.moveToLast()) {
-                    int taskId = cursor.getInt(cursor.getColumnIndex("id"));
-                    taskScheduler.scheduleTaskNotification(taskId, title, startTime, selectedDate);
-                    cursor.close();
-                }
-
-                // Kết thúc activity
+                int lastTaskId = dbHelper.getLastTaskId();
+                taskScheduler.scheduleTaskNotification(lastTaskId, title, startTime, selectedDate);
                 setResult(RESULT_OK);
                 finish();
             } else {
