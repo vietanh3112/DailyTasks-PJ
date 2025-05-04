@@ -108,11 +108,10 @@ public class TaskScheduler {
 
             if (pendingIntent != null) {
                 alarmManager.cancel(pendingIntent);
-                pendingIntent.cancel(); // Hủy PendingIntent để tránh tái sử dụng
+                pendingIntent.cancel();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // Không hiển thị Toast vì không có activity context
         }
     }
 }
